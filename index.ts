@@ -1,8 +1,9 @@
-import express from "express";
+import express, { Response, NextFunction, Request } from "express";
 import "reflect-metadata";
-import { AppDataSource } from "./src/ormconfig";
+import { AppDataSource } from "./src/database/ormconfig";
 import { router } from "./src/routers/user.routes";
-import { Request, Response } from "express";
+
+const cron = require("node-cron");
 
 const app: express.Application = express();
 
@@ -10,12 +11,9 @@ app.use(express.json());
 
 app.use("/user", router);
 
-app.get("/check", (req: any, res: any) => {
-  console.log("checking");
-  return res.status(200).json({ message: " Express Works" });
-});
 
-const port: number = 4000;
+
+const port: number = 5002;
 
 app.listen(port, async () => {
   try {
@@ -29,7 +27,15 @@ app.listen(port, async () => {
   }
 });
 
-// // Handling '/' Request
-// app.get('/', (_req, _res) => {
-//     _res.send("TypeScript With Express");
-// });
+cron.schedule("*/1 * * * *", () => {
+  fetch("https://official-joke-api.appspot.com/random_joke")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      return data;
+    })
+    .catch((error) => {
+      console.log(error);
+      console.error("Error fetching jokes.");
+    });
+});

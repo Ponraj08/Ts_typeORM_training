@@ -1,14 +1,13 @@
-
-import { user } from "../entities/users";
-import { AppDataSource } from "../ormconfig";
+import { user } from "../database/entities/users";
+import { AppDataSource } from "../database/ormconfig";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+// import { Iuser } from "../interfaceses";
 
 dotenv.config();
 
 const userRepository = AppDataSource.getRepository(user);
-
 
 //create neu user
 
@@ -18,7 +17,6 @@ export const posting = async (
   password: string,
   role: string
 ) => {
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const User = new user();
@@ -26,8 +24,6 @@ export const posting = async (
   User.email = email;
   User.password = hashedPassword;
   User.role = role;
-
-  
 
   const newUser = userRepository.create(User);
 
@@ -54,13 +50,11 @@ export const updating = async (
   const ID = parseInt(id);
   const currentUser = await userRepository.findOneBy({ id: ID });
   if (currentUser) {
-
-
     const newUserData = {
       ...currentUser,
       name: name || currentUser.name,
       email: email || currentUser.email,
- 
+
       role: role || currentUser.role,
     };
 
@@ -85,6 +79,7 @@ export const logining = async (name: string, password: string) => {
   });
 
   if (!User) {
+    
     throw new Error("Authentication failed: User not found");
   }
 
@@ -93,11 +88,13 @@ export const logining = async (name: string, password: string) => {
     throw new Error("Authentication failed: Incorrect password");
   }
 
-  const token = jwt.sign({ userId: User.id ,role: User.role}, process.env.JWT_SECRET!, {
-    expiresIn: "1h",
-  });
-
+  const token = jwt.sign(
+    { userId: User.id, role: User.role },
+    process.env.JWT_SECRET!,
+    {
+      expiresIn: "1h",
+    }
+  );
 
   return { token };
 };
-

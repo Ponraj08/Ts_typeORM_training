@@ -1,25 +1,20 @@
 import { Router } from "express";
 import { UserController } from "../controllers/UserController";
 import { authenticateJWT } from "../middleware/auth.middleware";
-import { authorizeRoles } from "../middleware/artho.middleware";
+import { authorizeRoles } from "../middleware/authorize.middleware";
+
+export const router = Router();
+
+const userController = new UserController();
+
+router.post("/", userController.createUser);
+
+router.get("/", authenticateJWT, userController.getuser);
 
 
-export const router =Router();
-
- const userController = new UserController();
+router.post("/login", userController.loginUser);
 
 
-router.post("/",userController.createUser)
+router.put("/update/:id",authenticateJWT,authorizeRoles,userController.updateuser);
 
-
-
-router.post("/login",userController.loginUser)
-
-
-router.get("/",authenticateJWT,userController.getuser);
-
-
-
-router.put("/update/:id",authenticateJWT,authorizeRoles,userController.updateuser)
-
-router.delete("/:id",authenticateJWT,authorizeRoles,userController.deleteUser)
+router.delete("/:id",authenticateJWT,authorizeRoles,userController.deleteUser);

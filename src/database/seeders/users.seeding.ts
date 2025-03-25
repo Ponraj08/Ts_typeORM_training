@@ -5,32 +5,28 @@ import bcrypt from "bcryptjs";
 const users = [
   {
     id: 1,
-    name:"ponraj",
-    email:"raj@08112003",
+    name: "ponraj",
+    email: "raj@08112003",
     password: bcrypt.hashSync("raj@1234", 10),
     role: "Admin",
   },
 
   {
     id: 2,
-    name:"vishnu",
-    email:"vis@gmail.com",
-    password:bcrypt.hashSync("vis@1234", 10),
+    name: "vishnu",
+    email: "vis@gmail.com",
+    password: bcrypt.hashSync("vis@1234", 10),
     role: "user",
   },
 ];
 
-
-
-
 async function RunSeed() {
   console.log("Script Started");
-  await AppDataSource.initialize()
+  await AppDataSource.initialize();
 
   console.log("Db initialized");
 
   if (AppDataSource.isInitialized) {
-
     const userRepository = AppDataSource.getRepository(user);
 
     for (const data of users) {
@@ -41,8 +37,7 @@ async function RunSeed() {
       });
 
       console.log(data);
-      
-      
+
       if (alreadyExist) {
         console.log(`User ${data.name} already exist`);
         continue;
