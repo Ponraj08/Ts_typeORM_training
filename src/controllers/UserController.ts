@@ -12,7 +12,7 @@ export class UserController {
   async createUser(req: Request, res: Response,next:NextFunction) {
     const { name, email, password, role } = req.body;
 
-const newUser = await posting(name, email, password, role);
+const newUser = await posting(name, email, password, role,next);
     res.json(newUser);
     return;
   }
@@ -23,11 +23,11 @@ const newUser = await posting(name, email, password, role);
     return;
   }
 
-  async updateuser(req: Request, res: Response) {
+  async updateuser(req: Request, res: Response,next:NextFunction) {
     const { name, email, password, role } = req.body;
     const { id } = req.params;
 
-    const newUserData = await updating(id, name, email, role);
+    const newUserData = await updating(id, name, email, role,next);
     res.json(newUserData);
     return;
   }
@@ -38,10 +38,10 @@ const newUser = await posting(name, email, password, role);
     return;
   }
 
-  async loginUser(req: Request, res: Response) {
+  async loginUser(req: Request, res: Response, next:NextFunction) {
     try {
       const { name, password } = req.body;
-      const loogi = await logining(name, password);
+      const loogi = await logining(name, password,next);
       res.status(200).json(loogi);
     } catch (error) {
       res.status(401).json({ error });

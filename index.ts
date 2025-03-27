@@ -2,6 +2,7 @@ import express, { Response, NextFunction, Request } from "express";
 import "reflect-metadata";
 import { AppDataSource } from "./src/database/ormconfig";
 import { router } from "./src/routers/user.routes";
+import errormiddleware from "./src/middleware/errorhandling.middleware";
 
 const cron = require("node-cron");
 
@@ -10,6 +11,8 @@ const app: express.Application = express();
 app.use(express.json());
 
 app.use("/user", router);
+
+app.use(errormiddleware)
 
 
 

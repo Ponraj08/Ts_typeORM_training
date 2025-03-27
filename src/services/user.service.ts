@@ -3,6 +3,7 @@ import { AppDataSource } from "../database/ormconfig";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { NextFunction } from "express";
 // import { Iuser } from "../interfaceses";
 
 dotenv.config();
@@ -15,10 +16,22 @@ export const posting = async (
   name: string,
   email: string,
   password: string,
-  role: string
+  role: string,
+  next:NextFunction
 ) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-
+  
+  if(!name || !email || !password || !role){
+    
+    return next({status:400,message:"all fields are required"})
+  }
+  
+  const isexisting =await userRepository.findOne({where:{email}})
+  
+  if(isexisting){
+    return next({status:409,message:"user already exists"})
+  }
+  
+  const hashedPassword =  bcrypt.hashSync(password, 10);
   const User = new user();
   User.name = name;
   User.email = email;
@@ -44,23 +57,26 @@ export const updating = async (
   id: string,
   name: string,
   email: string,
-
-  role: string
+  role: string,
+  next:NextFunction
 ) => {
   const ID = parseInt(id);
   const currentUser = await userRepository.findOneBy({ id: ID });
-  if (currentUser) {
-    const newUserData = {
-      ...currentUser,
-      name: name || currentUser.name,
-      email: email || currentUser.email,
+  if (!currentUser) {
 
-      role: role || currentUser.role,
-    };
+    return next({status:404,message:"user not found"})
 
-    const updatedUser = await userRepository.update({ id: ID }, newUserData);
-    return updatedUser;
   }
+  const newUserData = {
+    ...currentUser,
+    name: name || currentUser.name,
+    email: email || currentUser.email,
+
+    role: role || currentUser.role,
+  };
+
+  const updatedUser = await userRepository.update({ id: ID }, newUserData);
+  return updatedUser;
 };
 
 //delete users
@@ -73,19 +89,19 @@ export const deleting = async (id: string) => {
 
 //login users
 
-export const logining = async (name: string, password: string) => {
+export const logining = async (name: string, password: string,next:NextFunction) => {
   const User = await userRepository.findOne({
     where: { name },
   });
 
   if (!User) {
     
-    throw new Error("Authentication failed: User not found");
+    return next({status:404,message:"user not found"})
   }
 
   const passwordMatch = await bcrypt.compare(password, User.password);
   if (!passwordMatch) {
-    throw new Error("Authentication failed: Incorrect password");
+    return next({status:401,message:"password wrong"})
   }
 
   const token = jwt.sign(
