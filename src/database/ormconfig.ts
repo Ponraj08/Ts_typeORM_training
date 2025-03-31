@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+
 export const AppDataSource = new DataSource({
   type: "mysql",
   host: process.env.DATABASE_HOST,
