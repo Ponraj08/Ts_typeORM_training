@@ -10,7 +10,7 @@ dotenv.config();
 
 const userRepository = AppDataSource.getRepository(user);
 
-//create neu user
+//create new user
 
 export const posting = async (
   name: string,

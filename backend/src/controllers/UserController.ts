@@ -11,6 +11,7 @@ import {
 export class UserController {
   async createUser(req: Request, res: Response,next:NextFunction) {
     const { name, email, password, role } = req.body;
+console.log("Hii I regiser");
 
 const newUser = await posting(name, email, password, role,next);
     res.json(newUser);
@@ -33,6 +34,8 @@ const newUser = await posting(name, email, password, role,next);
   }
 
   async deleteUser(req: Request, res: Response) {
+
+    console.log("enter")
     const deleted = await deleting(req.params.id);
     res.status(200).json("deleted successfully");
     return;

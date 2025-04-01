@@ -1,5 +1,5 @@
-import { user } from "../entities/users";
-import { AppDataSource } from "../ormconfig";
+import { user } from "src/database/entities/users";
+import { AppDataSource } from "src/database/ormconfig";
 import bcrypt from "bcryptjs";
 
 const users = [
