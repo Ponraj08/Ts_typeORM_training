@@ -21,7 +21,7 @@ app.use(errormiddleware);
 app.use(express.static(path.join(__dirname,"../../frontend")))
 
 
-const port: number = 5000;
+const port: number = 5002;
 
 app.listen(port, async () => {
   try {

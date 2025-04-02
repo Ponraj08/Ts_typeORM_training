@@ -53,30 +53,35 @@ export const viewing = async () => {
 
 //update users
 
+
+
+
 export const updating = async (
   id: string,
   name: string,
   email: string,
   role: string,
-  next:NextFunction
+  next: NextFunction
 ) => {
   const ID = parseInt(id);
   const currentUser = await userRepository.findOneBy({ id: ID });
+
   if (!currentUser) {
-
-    return next({status:404,message:"user not found"})
-
+      const error: any = new Error("User not found");
+      error.status = 404;
+      return next(error); 
   }
-  const newUserData = {
-    ...currentUser,
-    name: name || currentUser.name,
-    email: email || currentUser.email,
 
-    role: role || currentUser.role,
+  const newUserData = {
+      ...currentUser,
+      name: name || currentUser.name,
+      email: email || currentUser.email,
+      role: role || currentUser.role,
   };
 
-  const updatedUser = await userRepository.update({ id: ID }, newUserData);
-  return updatedUser;
+  await userRepository.update({ id: ID }, newUserData);
+
+  return newUserData;
 };
 
 //delete users
@@ -100,6 +105,8 @@ export const logining = async (name: string, password: string,next:NextFunction)
   }
 
   const passwordMatch = await bcrypt.compare(password, User.password);
+  console.log(password);
+  
   if (!passwordMatch) {
     return next({status:401,message:"password wrong"})
   }

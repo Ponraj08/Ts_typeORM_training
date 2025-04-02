@@ -25,7 +25,7 @@ const newUser = await posting(name, email, password, role,next);
   }
 
   async updateuser(req: Request, res: Response,next:NextFunction) {
-    const { name, email, password, role } = req.body;
+    const { name, email, role } = req.body;
     const { id } = req.params;
 
     const newUserData = await updating(id, name, email, role,next);

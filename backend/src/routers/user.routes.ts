@@ -17,7 +17,7 @@ router.post("/login", userController.loginUser);
 
 router.put("/update/:id",authenticateJWT,authorizeRoles,userController.updateuser);
 
-router.delete("/:id",authenticateJWT,authorizeRoles,userController.deleteUser);
+router.delete("/delet/:id",authenticateJWT,authorizeRoles,userController.deleteUser);
 
 
 //curd in react without auth,authroize

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 export interface Idatas {
@@ -9,6 +10,9 @@ export interface Idatas {
   role: string;
 }
 function Home() {
+
+
+  const navigate=useNavigate()
   const [overalldata, setOveralldata] = useState<Idatas[]>([]);
 
   const [editinput, setEditinput] = useState(false);
@@ -16,14 +20,28 @@ function Home() {
   const [emailEdit,setEmailEdit]=useState("")
   const [roleEdit,setRoleEdit]=useState("")
   const [idedit,setIdEdit]=useState("")
+  const[erroralart,setErroralart]=useState("")
 
   //get method
 
   const gettingUsers = async () => {
     try {
+
+      const token = localStorage.getItem("jwtToken");
+   
+      if (!token) {
+          console.error("No token found. User might not be authenticated.");
+          
+      }
+
       const response = await axios.get(
-        "http://localhost:5000/user/getusers",
-      
+        "http://localhost:5002/user/getusers",
+        {
+          headers: {
+              Authorization: `Bearer ${token}`,  
+          }
+      }
+
       );
       console.log(response);
       const data: Idatas[] = response.data.map((datas: Idatas) => ({
@@ -48,32 +66,91 @@ function Home() {
     try {
       console.log(id);
       e.preventDefault();
-      await axios.delete(`http://localhost:5000/user/deletusers/${id}`);
+
+      const token = localStorage.getItem("jwtToken");
+   
+      if (!token) {
+          console.error("No token found. User might not be authenticated.");
+          return;
+      }
+
+      await axios.delete(`http://localhost:5002/user/delet/${id}`,
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,  
+        }
+    });
+
       gettingUsers();
-    } catch (err) {
-      console.log(err);
+    } catch (response:any) {
+      setErroralart(response.response.data.error);
+      alert(erroralart)
     }
   };
 
   //edit users
 
+ 
+
   const editusers = async (id: string, e: any) => {
     try {
         e.preventDefault();
-        await axios.put(`http://localhost:5000/user/updateusers/${id}`,{
-            name:nameEdit,
-            email:emailEdit,
-            role:roleEdit
 
-        });
-        gettingUsers();
-        
-    } catch (err) {}
+        const token = localStorage.getItem("jwtToken");
+
+        if (!token) {
+            console.error("No token found. User might not be authenticated.");
+            return;
+        }
+
+        await axios.put(`http://localhost:5002/user/update/${id}`,
+          {
+              name: nameEdit,
+              email: emailEdit,
+              role: roleEdit,
+          },
+          {
+              headers: {
+                  Authorization: `Bearer ${token}`,  
+              },
+          }
+      );
+      gettingUsers();
+    } catch (response:any) {
+      setErroralart(response.response.data.error)
+      alert(erroralart)
+    }
   };
+
+
+  const logout=(e:any)=>{
+
+    try{
+
+      e.preventDefault()
+      const token=localStorage.removeItem("jwtToken")
+      console.log(token)
+
+      navigate('/')
+
+    }catch(err){
+      console.log(err)
+    }
+
+    
+  }
 
   return (
     <>
+
+    <div>
       <h1 className="m-5">User and Admin Tables</h1>
+
+      <button className="btn btn-primary m-5" onClick={(e)=>{logout(e)}}>Logout</button>
+
+
+
+    </div>
 
       <table className="table  table-bordered table-hover m-5  me-5">
         <thead>

@@ -25,11 +25,12 @@ export const authorizeRoles = (
       res
         .status(403)
         .json({ error: "Access Denied: Insufficient Permissions" });
+        return
     }
 
     console.log(decode);
     next();
-    return;
+    
   } catch (error) {
 
     console.log(res.status)
